@@ -10,6 +10,9 @@ import torch
 from scipy.spatial.distance import cosine
 import numpy as np
 
+# Create five columns
+col1, col2, col3, col4, col5 = st.columns([2,1,2,1,1])
+
 def tag_visible(element):
     if element.parent.name in ['style', 'script', 'head', 'title', 'meta', '[document]']:
         return False
@@ -63,8 +66,18 @@ def get_bert_embeddings(text):
     sentence_embedding = torch.mean(token_vecs, dim=0)
     return sentence_embedding
 
-st.title("ReguTx Chatbot")
+# Display the first image in the first column
+col1.image('reguTx_logo.jpg', width=150, output_format='auto')
 
+# Leave the second column empty to create space
+
+# Display the title in the third column
+col3.title("ReguTx Chatbot")
+
+# Leave the fourth column empty to create space
+
+# Display the second image in the fifth column
+col5.image('reguTx_logo.jpg', width=150, output_format='auto')
 
 # Initialize chat history
 if "messages" not in st.session_state:
