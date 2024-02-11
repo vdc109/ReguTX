@@ -27,6 +27,11 @@ def text_from_html(body):
     visible_texts = filter(tag_visible, texts)  
     return u" ".join(t.strip() for t in visible_texts)
 
+def display_chat_history():
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
 tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased', truncation=True, max_model_input_size = 512)
 
 model = AutoModel.from_pretrained('bert-base-uncased',
@@ -35,10 +40,7 @@ model = AutoModel.from_pretrained('bert-base-uncased',
 
 model_name = "deepset/roberta-base-squad2"
 nlp = pipeline('question-answering', model=model_name, tokenizer=model_name)
-QA_input = {
-    'question': 'What is the the intended use/patient and the effect of the therapeutic service/device?',
-    'context': 'The webpage should include the indication for use of the therapeutic services/devices specifying the disease, symptoms or condition and the effects whether it is the diagnoses, treats, prevents, cures or mitigates.'
-}
+
 
 QA_model = AutoModelForQuestionAnswering.from_pretrained(model_name)
 QA_tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -83,24 +85,28 @@ col5.image('reguTx_logo.jpg', width=150, output_format='auto')
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-#start the conversation off with a message from the assistant
-st.session_state.messages.append(
-    {
-        "role": "assistant",
-        "content": "Hello! I'm a chatbot trained by ReguTx to inform you about the reliability of medical services. Please enter the service you are considering. (!help for manual)",
-    }
-)
+# Start the conversation off with a message from the assistant only on the first run
+if not st.session_state.messages:
+    st.session_state.messages.append(
+        {
+            "role": "assistant",
+            "content": "Hello! I'm a chatbot trained by ReguTx to inform you about the reliability of medical services. Please enter the URL for the service you are considering or !help for manual.",
+        }
+    )
 
 # Display chat messages from history on app rerun
 def display_last_message():
-    message = st.session_state.messages[len(st.session_state.messages)-1]
+    message = st.session_state.messages[-1]
 
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
-    
+
+# Call display_last_message() only once
 display_last_message()
 
 url_pattern = "^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"
+# Display chat history
+display_chat_history()
 
 # Accept user input
 if prompt := st.chat_input("What is up?"):
@@ -109,12 +115,12 @@ if prompt := st.chat_input("What is up?"):
 
     with st.chat_message("assistant"):
         if (prompt == "!help"):
-            response = """Function 1: Input URL for NLP analysis of therapeutic service. \nFunction 2: !display for Display database of international healthcare services documented by Crunchbase"""
+            response = """Please input your URL for NLP analysis of therapeutic service."""
         
             st.session_state.messages.append({"role": "assistant", "content": response})
             st.markdown(response)
         elif (re.match(url_pattern, prompt)):
-            response = "This is URL option: " + prompt
+            response = "This is the URL option: " + prompt + ". Feel free to enter another URL or !help for manual."
             st.session_state.messages.append({"role": "assistant", "content": response})
             st.markdown(response)
             try:
@@ -155,6 +161,10 @@ if prompt := st.chat_input("What is up?"):
                     st.markdown(response)
                 else:
                     response = "Treatment/therapeutic service is evidence based. "
+                    QA_input = {
+                        'question': 'Does this webpage include the indication for use of the therapeutic services/devices specifying the disease, symptoms or condition and the effects whether it is the diagnoses, treats, prevents, cures or mitigates?',
+                        'context': sentences[most_similar_sentence_index]
+                    }
                     res = nlp(QA_input)
                     print(res['answer'])
                     st.session_state.messages.append({"role": "assistant", "content": response+res['answer']})
@@ -167,7 +177,7 @@ if prompt := st.chat_input("What is up?"):
             st.session_state.messages.append({"role": "assistant", "content": response})
             st.markdown(response)
         else:
-            response = "Not relevent! Ask GPT"
+            response = "Not relevent! Ask Chat GPT for further assistance or use !help."
 
             st.session_state.messages.append({"role": "assistant", "content": response})
             st.markdown(response)
