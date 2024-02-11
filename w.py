@@ -87,7 +87,7 @@ if "messages" not in st.session_state:
 st.session_state.messages.append(
     {
         "role": "assistant",
-        "content": "Hello! I'm a chatbot trained by ReguTx to inform you about the reliability of therapeutic/medical services. Let me know of any that is on your mind! (!help for manual)",
+        "content": "Hello! I'm a chatbot trained by ReguTx to inform you about the reliability of medical services. Please enter the service you are considering. (!help for manual)",
     }
 )
 
@@ -109,7 +109,7 @@ if prompt := st.chat_input("What is up?"):
 
     with st.chat_message("assistant"):
         if (prompt == "!help"):
-            response = """Function 1: Input URL for NLP analysis of therapeutic service!; Function 2: !display for Display database of international healthcare services documented by Crunchbase"""
+            response = """Function 1: Input URL for NLP analysis of therapeutic service. \nFunction 2: !display for Display database of international healthcare services documented by Crunchbase"""
         
             st.session_state.messages.append({"role": "assistant", "content": response})
             st.markdown(response)
