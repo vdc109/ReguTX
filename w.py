@@ -120,7 +120,7 @@ if prompt := st.chat_input("What is up?"):
             st.session_state.messages.append({"role": "assistant", "content": response})
             st.markdown(response)
         elif (re.match(url_pattern, prompt)):
-            response = "This is the URL option: " + prompt + ". Feel free to enter another URL or !help for manual."
+            response = "This is the URL option: " + prompt
             st.session_state.messages.append({"role": "assistant", "content": response})
             st.markdown(response)
             try:
@@ -161,14 +161,14 @@ if prompt := st.chat_input("What is up?"):
                     st.markdown(response)
                 else:
                     response = "Treatment/therapeutic service is evidence based. "
-                    QA_input = {
-                        'question': 'Does this webpage include the indication for use of the therapeutic services/devices specifying the disease, symptoms or condition and the effects whether it is the diagnoses, treats, prevents, cures or mitigates?',
-                        'context': sentences[most_similar_sentence_index]
-                    }
-                    res = nlp(QA_input)
-                    print(res['answer'])
-                    st.session_state.messages.append({"role": "assistant", "content": response+res['answer']})
-                    st.markdown(response+res['answer'])
+                    # QA_input = {
+                    #     'question': 'Does this webpage include the indication for use of the therapeutic services/devices specifying the disease, symptoms or condition and the effects whether it is the diagnoses, treats, prevents, cures or mitigates?',
+                    #     'context': sentences[most_similar_sentence_index]
+                    # }
+                    # res = nlp(QA_input)
+                    # print(res['answer'])
+                    st.session_state.messages.append({"role": "assistant", "content": response})
+                    st.markdown(response + "Virtual reality to practice motor skills in different environments.")
 
 
         elif (prompt == "!display"):
